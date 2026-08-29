@@ -22,8 +22,8 @@ namespace Test_Taste_Console_Application.Domain.Objects
             }
         }
 
-        //Average temperature (Kelvin) of the moons that report one. Moons without a
-        //reading are skipped so a single 0 doesn't pull the average down.
+        //Average temperature (Kelvin) computed from the moons that report one.
+        //In practice the API has no moon temperatures, so this is 0.
         public double AverageMoonTemperature
         {
             get
@@ -33,10 +33,14 @@ namespace Test_Taste_Console_Application.Domain.Objects
             }
         }
 
+        //The planet's own average temperature in Kelvin, straight from the API.
+        public int AverageTemperature { get; set; }
+
         public Planet(PlanetDto planetDto)
         {
             Id = planetDto.Id;
             SemiMajorAxis = planetDto.SemiMajorAxis;
+            AverageTemperature = planetDto.AverageTemperature;
             Moons = new Collection<Moon>();
             if(planetDto.Moons != null)
             {
