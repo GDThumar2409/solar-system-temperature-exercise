@@ -16,6 +16,9 @@ namespace Test_Taste_Console_Application.Domain.Services
     {
         private readonly HttpClientService _httpClientService;
 
+        //Cached result: the output services call GetAllPlanets several times per run.
+        private IEnumerable<Planet> _cachedPlanets;
+
         public PlanetService(HttpClientService httpClientService)
         {
             _httpClientService = httpClientService;
@@ -23,6 +26,8 @@ namespace Test_Taste_Console_Application.Domain.Services
 
         public IEnumerable<Planet> GetAllPlanets()
         {
+            if (_cachedPlanets != null) return _cachedPlanets;
+
             var allPlanetsWithTheirMoons = new Collection<Planet>();
 
             var response = _httpClientService.Client
@@ -66,7 +71,8 @@ namespace Test_Taste_Console_Application.Domain.Services
                 allPlanetsWithTheirMoons.Add(new Planet(planet));
             }
 
-            return allPlanetsWithTheirMoons;
+            _cachedPlanets = allPlanetsWithTheirMoons;
+            return _cachedPlanets;
         }
 
         //Loads all moons in one request, keyed by their id (matches a planet moon's URLId).

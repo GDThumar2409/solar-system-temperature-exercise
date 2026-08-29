@@ -15,6 +15,8 @@ namespace Test_Taste_Console_Application.Domain.Services
     {
         private readonly HttpClientService _httpClientService;
 
+        //Cached result so repeated calls in one run don't hit the API again.
+        private IEnumerable<Moon> _cachedMoons;
 
         public MoonService(HttpClientService httpClientService)
         {
@@ -23,6 +25,8 @@ namespace Test_Taste_Console_Application.Domain.Services
 
         public IEnumerable<Moon> GetAllMoons()
         {
+            if (_cachedMoons != null) return _cachedMoons;
+
             var response = _httpClientService.Client
                 .GetAsync(UriPath.GetAllMoonsWithMassQueryParameters)
                 .Result;
@@ -48,7 +52,8 @@ namespace Test_Taste_Console_Application.Domain.Services
                 allMoons.Add(new Moon(moonDto));
             }
 
-            return allMoons;
+            _cachedMoons = allMoons;
+            return _cachedMoons;
         }
     }
 }
