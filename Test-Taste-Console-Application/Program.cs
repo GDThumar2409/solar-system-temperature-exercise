@@ -33,9 +33,9 @@ namespace Test_Taste_Console_Application
 
             try
             {
-                screenOutputService.OutputAllPlanetsAndTheirAverageMoonGravityToConsole();
-                screenOutputService.OutputAllMoonsAndTheirMassToConsole();
-                screenOutputService.OutputAllPlanetsAndTheirMoonsToConsole();
+                //screenOutputService.OutputAllPlanetsAndTheirAverageMoonGravityToConsole();
+                //screenOutputService.OutputAllMoonsAndTheirMassToConsole();
+                //screenOutputService.OutputAllPlanetsAndTheirMoonsToConsole();
                 //New list: planets with a moon and the average temperature of their moons.
                 screenOutputService.OutputAllPlanetsWithAtLeastOneMoonAndTheirAverageMoonTemperatureToConsole();
             }
