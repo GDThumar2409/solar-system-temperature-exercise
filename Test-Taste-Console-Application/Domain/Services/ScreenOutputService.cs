@@ -201,20 +201,26 @@ namespace Test_Taste_Console_Application.Domain.Services
                 return;
             }
 
-            Console.WriteLine("Reading each planet's temperature...");
+            Console.WriteLine("Calculating moon and planet temperatures...");
 
-            var columnSizes = new[] { 20, 20, 30 };
+            var columnSizes = new[] { 20, 15, 25, 25 };
             var columnLabels = new[]
             {
-                OutputString.PlanetId, OutputString.TotalMoons, OutputString.PlanetAverageTemperature
+                OutputString.PlanetId, OutputString.TotalMoons,
+                OutputString.PlanetMoonAverageTemperature, OutputString.PlanetAverageTemperature
             };
 
             ConsoleWriter.CreateHeader(columnLabels, columnSizes);
 
             foreach (Planet planet in planetsWithMoons)
             {
-                //The API has no moon temperatures, so we show the planet's own value.
-                var temperature = planet.AverageTemperature > 0
+                //Moon average is computed from the moons; the API has none, so it's "-".
+                var moonAverage = planet.AverageMoonTemperature > 0
+                    ? planet.AverageMoonTemperature.ToString(CultureInfoUtility.Culture)
+                    : "-";
+
+                //The planet's own temperature, straight from the API.
+                var planetTemperature = planet.AverageTemperature > 0
                     ? planet.AverageTemperature.ToString(CultureInfoUtility.Culture)
                     : "-";
 
@@ -223,7 +229,8 @@ namespace Test_Taste_Console_Application.Domain.Services
                     {
                         CultureInfoUtility.TextInfo.ToTitleCase(planet.Id),
                         planet.Moons.Count.ToString(),
-                        temperature
+                        moonAverage,
+                        planetTemperature
                     },
                     columnSizes);
             }

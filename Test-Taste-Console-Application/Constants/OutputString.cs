@@ -11,7 +11,8 @@ namespace Test_Taste_Console_Application.Constants
         public const string MoonMassExponent = "Moon's Mass Exponent";
         public const string MoonMassValue = "Moon's Mass Value";
         public const string PlanetMoonAverageGravity = "The Planet's Average Moon Gravity";
-        public const string PlanetAverageTemperature = "Planet Temperature (K)";
+        public const string PlanetMoonAverageTemperature = "Avg Moon Temp (K)";
+        public const string PlanetAverageTemperature = "Planet Temp (K)";
         public const string NoMoonsFound = "No moons found.";
         public const string NoPlanetsFound = "No planets found.";
         public const string NoPlanetsWithMoonsFound = "No planets with at least one moon were found.";

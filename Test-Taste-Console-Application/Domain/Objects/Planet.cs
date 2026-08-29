@@ -22,8 +22,18 @@ namespace Test_Taste_Console_Application.Domain.Objects
             }
         }
 
-        //The planet's own average temperature in Kelvin. The API has no temperature
-        //for any moon, so this is used instead of a moon-based average.
+        //Average temperature (Kelvin) computed from the moons that report one.
+        //In practice the API has no moon temperatures, so this is 0.
+        public double AverageMoonTemperature
+        {
+            get
+            {
+                var withTemp = Moons?.Where(m => m.AverageTemperature > 0).ToArray() ?? Array.Empty<Moon>();
+                return withTemp.Any() ? Math.Round(withTemp.Average(m => (double)m.AverageTemperature), 2) : 0.0d;
+            }
+        }
+
+        //The planet's own average temperature in Kelvin, straight from the API.
         public int AverageTemperature { get; set; }
 
         public Planet(PlanetDto planetDto)
