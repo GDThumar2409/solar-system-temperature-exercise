@@ -1,4 +1,4 @@
-﻿namespace Test_Taste_Console_Application.Constants
+namespace Test_Taste_Console_Application.Constants
 {
     public class OutputString
     {
@@ -11,8 +11,10 @@
         public const string MoonMassExponent = "Moon's Mass Exponent";
         public const string MoonMassValue = "Moon's Mass Value";
         public const string PlanetMoonAverageGravity = "The Planet's Average Moon Gravity";
+        public const string PlanetMoonAverageTemperature = "Avg Moon Temperature (K)";
         public const string NoMoonsFound = "No moons found.";
         public const string NoPlanetsFound = "No planets found.";
+        public const string NoPlanetsWithMoonsFound = "No planets with at least one moon were found.";
         public const string FileCreated = "The file is created in: ";
         public const string FolderCreated = "The folder is created in: ";
     }

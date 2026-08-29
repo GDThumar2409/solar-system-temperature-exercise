@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Test_Taste_Console_Application.Constants;
 using Test_Taste_Console_Application.Domain.Objects;
@@ -32,7 +32,7 @@ namespace Test_Taste_Console_Application.Domain.Services
                 return;
             }
 
-            //The column sizes and labels for the planets are configured here. 
+            //The column sizes and labels for the planets are configured here.
             var columnSizesForPlanets = new[] { 20, 20, 30, 20 };
             var columnLabelsForPlanets = new[]
             {
@@ -103,7 +103,7 @@ namespace Test_Taste_Console_Application.Domain.Services
         {
             //The function works the same way as the PrintAllPlanetsAndTheirMoonsToConsole function. You can find more comments there.
             var moons = _moonService.GetAllMoons().ToArray();
-            
+
             if (!moons.Any())
             {
                 Console.WriteLine(OutputString.NoMoonsFound);
@@ -131,13 +131,13 @@ namespace Test_Taste_Console_Application.Domain.Services
 
             ConsoleWriter.CreateLine(columnSizesForMoons);
             ConsoleWriter.CreateEmptyLines(2);
-            
+
             /*
                 This is an example of the output for the moon around the earth:
                 --------------------+--------------------+------------------------------+--------------------
                 Moon's Number       |Moon's Id           |Moon's Mass Exponent          |Moon's Mass Value
                 --------------------+--------------------+------------------------------+--------------------
-                1                   |Lune                |22                            |7,346             
+                1                   |Lune                |22                            |7,346
                 ...more data...
                 --------------------+--------------------+------------------------------+--------------------
              */
@@ -176,7 +176,7 @@ namespace Test_Taste_Console_Application.Domain.Services
 
             ConsoleWriter.CreateLine(columnSizes);
             ConsoleWriter.CreateEmptyLines(2);
-            
+
             /*
                 --------------------+--------------------------------------------------
                 Planet's Number     |Planet's Average Moon Gravity
@@ -184,6 +184,52 @@ namespace Test_Taste_Console_Application.Domain.Services
                 1                   |0.0f
                 --------------------+--------------------------------------------------
             */
+        }
+
+        public void OutputAllPlanetsWithAtLeastOneMoonAndTheirAverageMoonTemperatureToConsole()
+        {
+            Console.WriteLine("Loading planets and their moons...");
+
+            //Keep only the planets that actually have moons.
+            var planetsWithMoons = _planetService.GetAllPlanets()
+                .Where(planet => planet.HasMoons())
+                .ToArray();
+
+            if (!planetsWithMoons.Any())
+            {
+                Console.WriteLine(OutputString.NoPlanetsWithMoonsFound);
+                return;
+            }
+
+            Console.WriteLine("Calculating average moon temperature per planet...");
+
+            var columnSizes = new[] { 20, 20, 30 };
+            var columnLabels = new[]
+            {
+                OutputString.PlanetId, OutputString.TotalMoons, OutputString.PlanetMoonAverageTemperature
+            };
+
+            ConsoleWriter.CreateHeader(columnLabels, columnSizes);
+
+            foreach (Planet planet in planetsWithMoons)
+            {
+                //Dash when none of the moons has a temperature reading.
+                var temperature = planet.AverageMoonTemperature > 0
+                    ? planet.AverageMoonTemperature.ToString(CultureInfoUtility.Culture)
+                    : "-";
+
+                ConsoleWriter.CreateText(
+                    new[]
+                    {
+                        CultureInfoUtility.TextInfo.ToTitleCase(planet.Id),
+                        planet.Moons.Count.ToString(),
+                        temperature
+                    },
+                    columnSizes);
+            }
+
+            ConsoleWriter.CreateLine(columnSizes);
+            ConsoleWriter.CreateEmptyLines(2);
         }
     }
 }

@@ -1,9 +1,12 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 namespace Test_Taste_Console_Application.Utilities
 {
     public static class CultureInfoUtility
     {
         public static readonly TextInfo TextInfo = new CultureInfo("nl-BE").TextInfo;
+
+        //Invariant so numbers look the same on every machine.
+        public static readonly CultureInfo Culture = CultureInfo.InvariantCulture;
     }
 }
