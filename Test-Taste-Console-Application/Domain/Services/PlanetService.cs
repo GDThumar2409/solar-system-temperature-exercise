@@ -41,47 +41,70 @@ namespace Test_Taste_Console_Application.Domain.Services
             //The JSON converter uses DTO's, that can be found in the DataTransferObjects folder, to deserialize the response content.
             var results = JsonConvert.DeserializeObject<JsonResult<PlanetDto>>(content);
 
-            //The JSON converter can return a null object. 
+            //The JSON converter can return a null object.
             if (results == null) return allPlanetsWithTheirMoons;
 
-            //Each planet only references its moons, so every moon is fetched on its own
-            //to get the detailed data (mass, gravity, temperature).
+            //The planet payload only references its moons. Fetch every moon's detail
+            //in a single call and index it by id, instead of one request per moon.
+            var moonDetailsById = GetAllMoonDetailsById();
+
             foreach (var planet in results.Bodies)
             {
                 if(planet.Moons != null)
                 {
-                    var newMoonsCollection = new Collection<MoonDto>();
-                    foreach (var moon in planet.Moons)
+                    var detailedMoons = new Collection<MoonDto>();
+                    foreach (var moonReference in planet.Moons)
                     {
-                        try
-                        {
-                            var moonResponse = _httpClientService.Client
-                                .GetAsync(UriPath.GetMoonByIdQueryParameters + moon.URLId)
-                                .Result;
-
-                            if (!moonResponse.IsSuccessStatusCode)
-                            {
-                                Logger.Instance.Warn($"{LoggerMessage.GetRequestFailed}{moonResponse.StatusCode} ({moon.URLId})");
-                                continue;
-                            }
-
-                            var moonContent = moonResponse.Content.ReadAsStringAsync().Result;
-                            var moonDto = JsonConvert.DeserializeObject<MoonDto>(moonContent);
-                            if (moonDto != null) newMoonsCollection.Add(moonDto);
-                        }
-                        catch (Exception exception)
-                        {
-                            //One bad moon shouldn't stop the rest.
-                            Logger.Instance.Error($"Failed to load moon '{moon.URLId}': {exception.Message}");
-                        }
+                        //Use the detailed moon when we have it, otherwise keep the bare reference.
+                        detailedMoons.Add(
+                            moonDetailsById.TryGetValue(moonReference.URLId, out var details)
+                                ? details
+                                : moonReference);
                     }
-                    planet.Moons = newMoonsCollection;
-
+                    planet.Moons = detailedMoons;
                 }
                 allPlanetsWithTheirMoons.Add(new Planet(planet));
             }
 
             return allPlanetsWithTheirMoons;
+        }
+
+        //Loads all moons in one request, keyed by their id (matches a planet moon's URLId).
+        private IDictionary<string, MoonDto> GetAllMoonDetailsById()
+        {
+            var moonsById = new Dictionary<string, MoonDto>(StringComparer.OrdinalIgnoreCase);
+
+            try
+            {
+                var response = _httpClientService.Client
+                    .GetAsync(UriPath.GetAllMoonsWithDetailsQueryParameters)
+                    .Result;
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Logger.Instance.Warn($"{LoggerMessage.GetRequestFailed}{response.StatusCode} (moons)");
+                    return moonsById;
+                }
+
+                var content = response.Content.ReadAsStringAsync().Result;
+                var results = JsonConvert.DeserializeObject<JsonResult<MoonDto>>(content);
+                if (results?.Bodies == null) return moonsById;
+
+                foreach (var moon in results.Bodies)
+                {
+                    if (!string.IsNullOrEmpty(moon.Id))
+                    {
+                        moonsById[moon.Id] = moon;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                //Without moon details the averages fall back to 0; that's better than failing.
+                Logger.Instance.Error($"Failed to load moon details: {exception.Message}");
+            }
+
+            return moonsById;
         }
     }
 }

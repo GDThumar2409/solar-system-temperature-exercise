@@ -11,6 +11,10 @@
         public const string GetAllMoonsWithMassQueryParameters = BodiesUri +
                                                "?data=id,mass,massValue,massExponent,massValue&filter[]=aroundPlanet,gt,null";
 
+        //All moons with the fields the planet needs, in one call (avoids one request per moon).
+        public const string GetAllMoonsWithDetailsQueryParameters = BodiesUri +
+                                               "?data=id,mass,massValue,massExponent,avgTemp,gravity&filter[]=aroundPlanet,gt,null";
+
         public const string GetMoonByIdQueryParameters = BodiesUri + "/";
     }
 }
