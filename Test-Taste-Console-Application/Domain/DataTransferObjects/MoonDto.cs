@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Test_Taste_Console_Application.Domain.DataTransferObjects.JsonObjects;
@@ -26,5 +26,11 @@ namespace Test_Taste_Console_Application.Domain.DataTransferObjects
         //The path to the nested property is created by using a dot. 
         [JsonProperty("mass.massValue")] public float MassValue { get; set; }
         [JsonProperty("mass.massExponent")] public float MassExponent { get; set; }
+
+        //Average temperature in Kelvin (0 when the API has no value).
+        [JsonProperty("avgTemp")] public int AverageTemperature { get; set; }
+
+        //Surface gravity in m/s2.
+        [JsonProperty("gravity")] public float Gravity { get; set; }
     }
 }
