@@ -10,14 +10,27 @@
       <None Remove="FileOutput\" />
       <None Remove="Domain\Objects\" />
     </ItemGroup>
+
     <ItemGroup>
       <PackageReference Include="log4net" Version="2.0.17" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-<None Update="log4net.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="log4net.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <!-- Real secrets file: copied to output when present, never committed (see .gitignore). -->
+      <None Update="appsettings.json" Condition="Exists('appsettings.json')">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="appsettings.example.json">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
