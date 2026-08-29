@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using log4net;
@@ -35,13 +35,15 @@ namespace Test_Taste_Console_Application
                 screenOutputService.OutputAllPlanetsAndTheirAverageMoonGravityToConsole();
                 screenOutputService.OutputAllMoonsAndTheirMassToConsole();
                 screenOutputService.OutputAllPlanetsAndTheirMoonsToConsole();
+                //New list: planets with a moon and the average temperature of their moons.
+                screenOutputService.OutputAllPlanetsWithAtLeastOneMoonAndTheirAverageMoonTemperatureToConsole();
             }
             catch (Exception exception)
             {
                 //The users and developers can see the thrown exceptions.
                 Logger.Instance.Error($"{LoggerMessage.ScreenOutputOperationFailed}{exception.Message}");
                 Console.WriteLine($"{ExceptionMessage.ScreenOutputOperationFailed}{exception.Message}");
-                System.Diagnostics.Debug.WriteLine($""{ExceptionMessage.ScreenOutputOperationFailed}{exception.Message}"");
+                System.Diagnostics.Debug.WriteLine($"{ExceptionMessage.ScreenOutputOperationFailed}{exception.Message}");
             }
 
             serviceProvider.Dispose();
