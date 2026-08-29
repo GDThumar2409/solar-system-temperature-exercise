@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Test_Taste_Console_Application.Constants;
+using Test_Taste_Console_Application.Utilities;
 
 namespace Test_Taste_Console_Application.Domain.Services
 {
@@ -19,6 +20,18 @@ namespace Test_Taste_Console_Application.Domain.Services
             Client.BaseAddress = new Uri(UriPath.BaseUri);
             Client.DefaultRequestHeaders.Accept.Add(new
                 MediaTypeWithQualityHeaderValue(HttpClientSettings.JsonType));
+
+            //The API now needs a free API key as a bearer token. It is read from an
+            //env var so it stays out of source control. Without it every call is a 401.
+            var apiKey = Environment.GetEnvironmentVariable(HttpClientSettings.ApiKeyEnvironmentVariable);
+            if (!string.IsNullOrWhiteSpace(apiKey))
+            {
+                Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey.Trim());
+            }
+            else
+            {
+                Logger.Instance.Warn($"{HttpClientSettings.ApiKeyEnvironmentVariable} is not set; API calls will return 401.");
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Text;
 using Newtonsoft.Json;
 using Test_Taste_Console_Application.Constants;
 using Test_Taste_Console_Application.Domain.DataTransferObjects;
@@ -45,7 +44,8 @@ namespace Test_Taste_Console_Application.Domain.Services
             //The JSON converter can return a null object. 
             if (results == null) return allPlanetsWithTheirMoons;
 
-            //If the planet doesn't have any moons, then it isn't added to the collection.
+            //Each planet only references its moons, so every moon is fetched on its own
+            //to get the detailed data (mass, gravity, temperature).
             foreach (var planet in results.Bodies)
             {
                 if(planet.Moons != null)
@@ -53,11 +53,27 @@ namespace Test_Taste_Console_Application.Domain.Services
                     var newMoonsCollection = new Collection<MoonDto>();
                     foreach (var moon in planet.Moons)
                     {
-                        var moonResponse = _httpClientService.Client
-                            .GetAsync(UriPath.GetMoonByIdQueryParameters + moon.URLId)
-                            .Result;
-                        var moonContent = moonResponse.Content.ReadAsStringAsync().Result;
-                        newMoonsCollection.Add(JsonConvert.DeserializeObject<MoonDto>(moonContent));
+                        try
+                        {
+                            var moonResponse = _httpClientService.Client
+                                .GetAsync(UriPath.GetMoonByIdQueryParameters + moon.URLId)
+                                .Result;
+
+                            if (!moonResponse.IsSuccessStatusCode)
+                            {
+                                Logger.Instance.Warn($"{LoggerMessage.GetRequestFailed}{moonResponse.StatusCode} ({moon.URLId})");
+                                continue;
+                            }
+
+                            var moonContent = moonResponse.Content.ReadAsStringAsync().Result;
+                            var moonDto = JsonConvert.DeserializeObject<MoonDto>(moonContent);
+                            if (moonDto != null) newMoonsCollection.Add(moonDto);
+                        }
+                        catch (Exception exception)
+                        {
+                            //One bad moon shouldn't stop the rest.
+                            Logger.Instance.Error($"Failed to load moon '{moon.URLId}': {exception.Message}");
+                        }
                     }
                     planet.Moons = newMoonsCollection;
 
@@ -66,26 +82,6 @@ namespace Test_Taste_Console_Application.Domain.Services
             }
 
             return allPlanetsWithTheirMoons;
-        }
-
-        private static string RemoveDiacritics(string text)
-        {
-            var normalizedString = text.Normalize(NormalizationForm.FormD);
-            var stringBuilder = new StringBuilder(capacity: normalizedString.Length);
-
-            for (int i = 0; i < normalizedString.Length; i++)
-            {
-                char c = normalizedString[i];
-                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
-                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
-                {
-                    stringBuilder.Append(c);
-                }
-            }
-
-            return stringBuilder
-                .ToString()
-                .Normalize(NormalizationForm.FormC);
         }
     }
 }
